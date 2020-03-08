@@ -1,4 +1,4 @@
-package src.main.java.com.fastbj.activeMQ;
+package com.fastbj.activeMQ.Queue;
 
 //import org.apache.activemq;
 
