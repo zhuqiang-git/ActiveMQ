@@ -28,7 +28,7 @@ public class producter {
         // 设置不持久化（就是设置为点对点通信，如果持久化就是发布订阅模式）
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         // 发送一条消息
-        for (int i = 1; i <= 500000; i++) {
+        for (int i = 1; i <= 500; i++) {
             sendMsg(session, producer, i);
         }
         connection.close();
