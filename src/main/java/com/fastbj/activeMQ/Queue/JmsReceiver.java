@@ -2,10 +2,13 @@ package com.fastbj.activeMQ.Queue;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
 
 public class JmsReceiver {
+    private static final Logger logs = LoggerFactory.getLogger(JmsReceiver.class);
     public static void main(String[] args) throws JMSException {
 // ConnectionFactory ：连接工厂，JMS 用它创建连接
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
@@ -33,6 +36,8 @@ public class JmsReceiver {
         }
         session.close();
         connection.close();
+
+        logs.error("消息推送成功");
 
 
     }
