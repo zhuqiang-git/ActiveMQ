@@ -14,7 +14,7 @@ public class producter {
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER,
                 ActiveMQConnection.DEFAULT_PASSWORD,
-                "tcp://118.25.154.234:61616");
+                "tcp://118.25.154.235:61616");
         // JMS 客户端到JMS Provider 的连接
         Connection connection = connectionFactory.createConnection();
         connection.start();

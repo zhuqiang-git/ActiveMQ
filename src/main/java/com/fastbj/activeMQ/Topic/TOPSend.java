@@ -6,7 +6,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import javax.jms.*;
 
 public class TOPSend {
-    private static String BROKERURL = "tcp://118.25.154.234:61616";
+    private static String BROKERURL = "tcp://118.25.154.235:61616";
     private static String TOPIC = "my-topic";
 
     public static void main(String[] args) throws JMSException {
