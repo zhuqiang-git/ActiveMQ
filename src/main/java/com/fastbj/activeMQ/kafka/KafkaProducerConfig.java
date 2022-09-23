@@ -32,6 +32,9 @@ public class KafkaProducerConfig {
         valueSerializer = p.readProperty("kafka.producer.value-serializer");
         retries = Integer.parseInt(p.readProperty("kafka.producer.retries"));
 
+
+
+
     }
 
     private ProducerFactory<String, String> producerFactory() {
