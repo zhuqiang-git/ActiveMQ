@@ -9,6 +9,7 @@ import javax.jms.*;
 
 public class JmsReceiver {
     private static final Logger logs = LoggerFactory.getLogger(JmsReceiver.class);
+
     public static void main(String[] args) throws JMSException {
 // ConnectionFactory ：连接工厂，JMS 用它创建连接
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
@@ -38,6 +39,10 @@ public class JmsReceiver {
         connection.close();
 
         logs.error("消息推送成功");
+        try {
+        } catch(Exception e) {
+            logs.error("推送失败{}",e);
+        }
 
 
     }
