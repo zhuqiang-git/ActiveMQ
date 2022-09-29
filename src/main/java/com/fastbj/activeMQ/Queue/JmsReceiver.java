@@ -40,6 +40,9 @@ public class JmsReceiver {
 
         logs.error("消息推送成功");
         try {
+
+
+
         } catch(Exception e) {
             logs.error("推送失败{}",e);
         }
