@@ -41,6 +41,7 @@ public class JmsReceiver {
         logs.error("消息推送成功");
         try {
 
+            System.out.println(10/0);
 
 
         } catch(Exception e) {
