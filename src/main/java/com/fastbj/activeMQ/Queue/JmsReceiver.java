@@ -41,6 +41,8 @@ public class JmsReceiver {
         logs.error("消息推送成功");
         try {
 
+
+            //ping不可达
             System.out.println(10/0);
 
 
