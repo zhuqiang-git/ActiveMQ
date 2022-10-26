@@ -42,7 +42,7 @@ public class JmsReceiver {
         try {
 
 ///关联分析
-
+//宿主机宕机分析
 
 
             //ping不可达
