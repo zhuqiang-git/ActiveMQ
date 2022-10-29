@@ -44,6 +44,7 @@ public class JmsReceiver {
 ///关联分析
 //宿主机宕机分析
             //key全部转换成小写
+            //增加黑名单类型
 
             //ping不可达
             System.out.println(10/0);
