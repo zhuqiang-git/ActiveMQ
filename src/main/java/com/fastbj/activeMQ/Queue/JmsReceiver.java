@@ -46,6 +46,8 @@ public class JmsReceiver {
             //key全部转换成小写
             //增加黑名单类型
 
+            //优化逻辑
+
             //ping不可达
             System.out.println(10/0);
 
