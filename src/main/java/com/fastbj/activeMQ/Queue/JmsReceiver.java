@@ -51,6 +51,7 @@ public class JmsReceiver {
             //ping不可达
 
             //优化检测状态逻辑
+            //
             System.out.println(10/0);
 
 
