@@ -63,7 +63,6 @@ public class JmsReceiver {
 
 
 
-
         } catch(Exception e) {
             logs.error("推送失败{}",e);
         }
