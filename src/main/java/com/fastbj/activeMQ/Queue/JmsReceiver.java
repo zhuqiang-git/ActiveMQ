@@ -56,21 +56,6 @@ public class JmsReceiver {
 
             System.out.println(10/0);
 
-
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
         } catch(Exception e) {
             logs.error("推送失败{}",e);
         }
