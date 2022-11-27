@@ -53,6 +53,10 @@ public class JmsReceiver {
             //优化检测状态逻辑
             //交易超时
 
+
+
+
+
             System.out.println(10/0);
 
         } catch(Exception e) {
