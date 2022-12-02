@@ -54,12 +54,6 @@ public class JmsReceiver {
             //交易超时
 
 
-
-
-
-
-
-
             System.out.println(10/0);
 
         } catch(Exception e) {
