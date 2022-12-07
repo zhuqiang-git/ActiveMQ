@@ -13,5 +13,8 @@ public class RegistryConfig {
 
 
     public enum RegistType{ EXECUTOR, ADMIN }
+    
+    
+    
 
 }
