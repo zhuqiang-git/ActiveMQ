@@ -37,6 +37,8 @@ public class KafkaConsumerConfig {
     static{
 
 
+        
+        
         PropertiesUtil iknowCommonProperties=new PropertiesUtil("/iknowcommon.properties");
         String iknowCommonKafkaFileName=iknowCommonProperties.readProperty("iknowcommon.config.filename");
 
