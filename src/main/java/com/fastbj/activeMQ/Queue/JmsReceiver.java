@@ -14,7 +14,5 @@ public class JmsReceiver {
 
         System.out.println("ok");
 
-
-
     }
 }
