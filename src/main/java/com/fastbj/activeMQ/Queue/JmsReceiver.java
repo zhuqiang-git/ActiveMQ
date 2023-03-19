@@ -16,11 +16,5 @@ public class JmsReceiver {
 
 
 
-
-
-
-
-
-
     }
 }
