@@ -32,6 +32,9 @@ public class producter {
             sendMsg(session, producer, i);
         }
         connection.close();
+
+
+
     }
 
     /**
