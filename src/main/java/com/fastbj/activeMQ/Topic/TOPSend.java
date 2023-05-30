@@ -11,8 +11,6 @@ public class TOPSend {
 
     public static void main(String[] args) throws JMSException {
         start();
-        
-        
     }
 
     private static void start() throws JMSException {
