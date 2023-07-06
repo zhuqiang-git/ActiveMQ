@@ -6,13 +6,4 @@ package com.fastbj.activeMQ.Queue;
 public class BusinessAnalysis {
 
 
-    
-    
-    
-
-    //
-
-
-
-
 }
