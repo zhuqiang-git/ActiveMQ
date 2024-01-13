@@ -12,5 +12,6 @@ public class JmsReceiver {
 
     public static void main(String[] args) throws JMSException {
         System.out.println("ok");
+
     }
 }
