@@ -15,6 +15,8 @@ public class TopReceiver {
 
     private static void start() throws JMSException {
         System.out.println("消费点启动...。。。");
+
+
         // 创建ActiveMQConnectionFactory 会话工厂
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER, ActiveMQConnection.DEFAULT_PASSWORD, BROKERURL);
