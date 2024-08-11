@@ -10,6 +10,8 @@ public enum ExecutorBlockStrategyEnum {
     DISCARD_LATER("Discard Later"),
     COVER_EARLY("Cover Early");
 
+
+
     private String title;
     private ExecutorBlockStrategyEnum (String title) {
         this.title = title;
