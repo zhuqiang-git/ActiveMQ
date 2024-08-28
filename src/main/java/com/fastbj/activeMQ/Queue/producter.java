@@ -10,6 +10,7 @@ import javax.jms.*;
 public class producter {
 
     public static void main(String[] args) throws JMSException {
+        
         // ConnectionFactory ：连接工厂，JMS 用它创建连接
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER,
