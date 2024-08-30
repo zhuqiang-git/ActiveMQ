@@ -14,6 +14,7 @@ public class TOPSend {
     }
 
     private static void start() throws JMSException {
+        
         System.out.println("生产者已经启动......");
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER, ActiveMQConnection.DEFAULT_PASSWORD, BROKERURL);
