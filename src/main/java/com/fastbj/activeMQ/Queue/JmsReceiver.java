@@ -10,6 +10,7 @@ import javax.jms.*;
 public class JmsReceiver {
     private static final Logger logs = LoggerFactory.getLogger(JmsReceiver.class);
 
+    
     public static void main(String[] args) throws JMSException {
         System.out.println("ok");
     }
