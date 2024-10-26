@@ -10,6 +10,7 @@ public class TopReceiver {
     private static String TOPIC = "my-topic";
 
     public static void main(String[] args) throws JMSException {
+        
         start();
     }
 
