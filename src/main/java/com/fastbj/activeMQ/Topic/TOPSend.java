@@ -13,6 +13,7 @@ public class TOPSend {
         start();
     }
 
+    
     private static void start() throws JMSException {
         
         System.out.println("生产者已经启动......");
