@@ -14,4 +14,21 @@ public class JmsReceiver {
     public static void main(String[] args) throws JMSException {
         System.out.println("ok");
     }
+
+     public static void main(String[] args) {
+        try {
+            // 获取本机的InetAddress实例
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            
+            // 获取IP地址字符串
+            String ipAddress = inetAddress.getHostAddress();
+            
+            // 打印IP地址
+            System.out.println("Local IP Address: " + ipAddress);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
 }
