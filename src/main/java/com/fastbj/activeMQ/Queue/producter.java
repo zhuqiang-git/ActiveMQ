@@ -38,6 +38,43 @@ public class producter {
 
     }
 
+
+        /**
+     * 读取指定 key 下所有 member, 按照 score 升序(默认)
+     */
+    public Collection<Object> getZSetMembers(String key, int startIndex, int endIndex) {
+        RScoredSortedSet<Object> scoredSortedSet = client.getScoredSortedSet(key);
+        return scoredSortedSet.valueRange(startIndex, endIndex);
+    }
+ 
+    /**
+     * 取指定 key 下所有 member, 按照 score 降序
+     */
+    public Collection<Object> getZSetMembersReversed(String key, int startIndex, int endIndex) {
+        RScoredSortedSet<Object> scoredSortedSet = client.getScoredSortedSet(key);
+        return scoredSortedSet.valueRangeReversed(startIndex, endIndex);
+    }
+
+      /**
+     * 读取 member和score, 按照 score 升序(默认)
+     */
+    public Collection<ScoredEntry<Object>> getZSetEntryRange(String key, int startIndex, int endIndex) {
+        RScoredSortedSet<Object> scoredSortedSet = client.getScoredSortedSet(key);
+        return scoredSortedSet.entryRange(startIndex, endIndex);
+    }
+ 
+ 
+    /**
+     * 读取 member和score, 按照 score 降序
+     */
+    public Collection<ScoredEntry<Object>> getZSetEntryRangeReversed(String key, int startIndex, int endIndex) {
+        RScoredSortedSet<Object> scoredSortedSet = client.getScoredSortedSet(key);
+        return scoredSortedSet.entryRangeReversed(startIndex, endIndex);
+
+    }
+
+                            
+
     /**
      * 在指定的会话上，通过指定的消息生产者发出一条消息
      *
