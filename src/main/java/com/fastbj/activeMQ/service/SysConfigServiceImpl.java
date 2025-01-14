@@ -229,4 +229,17 @@ public class SysConfigServiceImpl implements ISysConfigService
     {
         return CacheConstants.SYS_CONFIG_KEY + configKey;
     }
+
+        /**
+     * 拼接权限sql前先清空params.dataScope参数防止注入
+     */
+    private void clearDataScope(final JoinPoint joinPoint)
+    {
+        Object params = joinPoint.getArgs()[0];
+        if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
+        {
+            BaseEntity baseEntity = (BaseEntity) params;
+            baseEntity.getParams().put(DATA_SCOPE, "");
+        }
+    }
 }
