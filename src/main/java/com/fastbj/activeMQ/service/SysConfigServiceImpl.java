@@ -125,6 +125,47 @@ public class SysConfigServiceImpl implements ISysConfigService
         return row;
     }
 
+    
+    /**
+     * 异步执行,直到所有都完成,或失败后，发起回调
+     */
+    public static void beginWorkAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, WorkerWrapper... workerWrapper) {
+        if (groupCallback == null) {
+            groupCallback = new DefaultGroupCallback();
+        }
+        IGroupCallback finalGroupCallback = groupCallback;
+        if (executorService != null) {
+            executorService.submit(() -> {
+                try {
+                    boolean success = beginWork(timeout, executorService, workerWrapper);
+                    if (success) {
+                        finalGroupCallback.success(Arrays.asList(workerWrapper));
+                    } else {
+                        finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                    finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
+                }
+            });
+        } else {
+            COMMON_POOL.submit(() -> {
+                try {
+                    boolean success = beginWork(timeout, COMMON_POOL, workerWrapper);
+                    if (success) {
+                        finalGroupCallback.success(Arrays.asList(workerWrapper));
+                    } else {
+                        finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                    finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
+                }
+            });
+        }
+
+    }
+
     /**
      * 修改参数配置
      * 
