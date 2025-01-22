@@ -102,5 +102,27 @@ public class SysJobLogServiceImpl implements ISysJobLogService
                 "  completedCount " + COMMON_POOL.getCompletedTaskCount() +
                 "  largestCount " + COMMON_POOL.getLargestPoolSize();
     }
+
+
+    
+    private void scheduleClockUpdating() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "System Clock");
+            thread.setDaemon(true);
+            return thread;
+        });
+        scheduler.scheduleAtFixedRate(() -> now.set(System.currentTimeMillis()), period, period, TimeUnit.MILLISECONDS);
+    }
+
+    private long currentTimeMillis() {
+        return now.get();
+    }
+
+    /**
+     * 用来替换原来的System.currentTimeMillis()
+     */
+    public static long now() {
+        return instance().currentTimeMillis();
+    }
     
 }
