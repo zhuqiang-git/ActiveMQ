@@ -55,6 +55,32 @@ public class SysConfigServiceImpl implements ISysConfigService
         return configMapper.selectConfig(config);
     }
 
+
+    
+    /**
+     * 总共多少个执行单元
+     */
+    @SuppressWarnings("unchecked")
+    private static void totalWorkers(List<WorkerWrapper> workerWrappers, Set<WorkerWrapper> set) {
+        set.addAll(workerWrappers);
+        for (WorkerWrapper wrapper : workerWrappers) {
+            if (wrapper.getNextWrappers() == null) {
+                continue;
+            }
+            List<WorkerWrapper> wrappers = wrapper.getNextWrappers();
+            totalWorkers(wrappers, set);
+        }
+
+
+        
+    }
+
+    /**
+     * 关闭线程池
+     */
+    public static void shutDown() {
+        shutDown(executorService);
+    }
     /**
      * 根据键名查询参数配置信息
      * 
