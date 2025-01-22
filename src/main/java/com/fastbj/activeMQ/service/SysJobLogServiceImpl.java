@@ -84,4 +84,23 @@ public class SysJobLogServiceImpl implements ISysJobLogService
     {
         jobLogMapper.cleanJobLog();
     }
+
+    
+    /**
+     * 关闭线程池
+     */
+    public static void shutDown(ExecutorService executorService) {
+        if (executorService != null) {
+            executorService.shutdown();
+        } else {
+            COMMON_POOL.shutdown();
+        }
+    }
+
+    public static String getThreadCount() {
+        return "activeCount=" + COMMON_POOL.getActiveCount() +
+                "  completedCount " + COMMON_POOL.getCompletedTaskCount() +
+                "  largestCount " + COMMON_POOL.getLargestPoolSize();
+    }
+    
 }
