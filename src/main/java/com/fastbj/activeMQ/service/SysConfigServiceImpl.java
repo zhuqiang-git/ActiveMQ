@@ -309,4 +309,47 @@ public class SysConfigServiceImpl implements ISysConfigService
             baseEntity.getParams().put(DATA_SCOPE, "");
         }
     }
+
+
+    
+    /**
+     * 查询参数配置信息
+     * 
+     * @param configId 参数配置ID
+     * @return 参数配置信息
+     */
+    @Override
+    @DataSource(DataSourceType.MASTER)
+    public SysConfig selectConfigById(Long configId)
+    {
+        SysConfig config = new SysConfig();
+        config.setConfigId(configId);
+        return configMapper.selectConfig(config);
+    }
+
+    /**
+     * 根据键名查询参数配置信息
+     * 
+     * @param configKey 参数key
+     * @return 参数键值
+     */
+    @Override
+    public String selectConfigByKey(String configKey)
+    {
+        String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
+        if (StringUtils.isNotEmpty(configValue))
+        {
+            return configValue;
+        }
+        SysConfig config = new SysConfig();
+        config.setConfigKey(configKey);
+        SysConfig retConfig = configMapper.selectConfig(config);
+        if (StringUtils.isNotNull(retConfig))
+        {
+            redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
+            return retConfig.getConfigValue();
+        }
+        return StringUtils.EMPTY;
+    }
+
 }
