@@ -75,6 +75,61 @@ public class SysConfigServiceImpl implements ISysConfigService
         
     }
 
+
+
+    
+    /**
+     * 根据键名查询参数配置信息
+     * 
+     * @param configKey 参数key
+     * @return 参数键值
+     */
+    @Override
+    public String selectConfigByKey(String configKey)
+    {
+        String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
+        if (StringUtils.isNotEmpty(configValue))
+        {
+            return configValue;
+        }
+        SysConfig config = new SysConfig();
+        config.setConfigKey(configKey);
+        SysConfig retConfig = configMapper.selectConfig(config);
+        if (StringUtils.isNotNull(retConfig))
+        {
+            redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
+            return retConfig.getConfigValue();
+        }
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取验证码开关
+     * 
+     * @return true开启，false关闭
+     */
+    @Override
+    public boolean selectCaptchaEnabled()
+    {
+        String captchaEnabled = selectConfigByKey("sys.account.captchaEnabled");
+        if (StringUtils.isEmpty(captchaEnabled))
+        {
+            return true;
+        }
+        return Convert.toBool(captchaEnabled);
+    }
+
+    /**
+     * 查询参数配置列表
+     * 
+     * @param config 参数配置信息
+     * @return 参数配置集合
+     */
+    @Override
+    public List<SysConfig> selectConfigList(SysConfig config)
+    {
+        return configMapper.selectConfigList(config);
+    }
     /**
      * 关闭线程池
      */
