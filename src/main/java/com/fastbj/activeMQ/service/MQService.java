@@ -440,6 +440,93 @@ public class MQService implements ApplicationListener<SecurityConnectEvent>, Act
         }
     }
 
+    
+    private List<AbstractMethod> getJoinMethod() {
+        List<AbstractMethod> list = new ArrayList<>();
+        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.5.0") >= 0) {
+            list.add(new DeleteJoin(SqlMethod.DELETE_JOIN.getMethod()));
+            list.add(new UpdateJoin(SqlMethod.UPDATE_JOIN.getMethod()));
+            list.add(new UpdateJoinAndNull(SqlMethod.UPDATE_JOIN_AND_NULL.getMethod()));
+            list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
+            list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
+            list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));
+            list.add(new SelectJoinPage(SqlMethod.SELECT_JOIN_PAGE.getMethod()));
+            list.add(new SelectJoinMap(SqlMethod.SELECT_JOIN_MAP.getMethod()));
+            list.add(new SelectJoinMaps(SqlMethod.SELECT_JOIN_MAPS.getMethod()));
+            list.add(new SelectJoinMapsPage(SqlMethod.SELECT_JOIN_MAPS_PAGE.getMethod()));
+        } else {
+            list.add(new DeleteJoin());
+            list.add(new UpdateJoin());
+            list.add(new UpdateJoinAndNull());
+            list.add(new SelectJoinCount());
+            list.add(new SelectJoinOne());
+            list.add(new SelectJoinList());
+            list.add(new SelectJoinPage());
+            list.add(new SelectJoinMap());
+            list.add(new SelectJoinMaps());
+            list.add(new SelectJoinMapsPage());
+        }
+        return list;
+    }
+
+    private List<AbstractMethod> getWrapperMethod() {
+        List<AbstractMethod> list = new ArrayList<>();
+        list.add(new com.github.yulichang.method.mp.Delete());
+        list.add(new com.github.yulichang.method.mp.SelectOne());
+        list.add(new com.github.yulichang.method.mp.SelectCount());
+        list.add(new com.github.yulichang.method.mp.SelectMaps());
+        list.add(new com.github.yulichang.method.mp.SelectMapsPage());
+        list.add(new com.github.yulichang.method.mp.SelectObjs());
+        list.add(new com.github.yulichang.method.mp.SelectList());
+        list.add(new com.github.yulichang.method.mp.SelectPage());
+        list.add(new com.github.yulichang.method.mp.Update());
+        return list;
+    }
+
+    private void addAll(List<AbstractMethod> source, List<AbstractMethod> addList) {
+        for (AbstractMethod method : addList) {
+            if (source.stream().noneMatch(m -> m.getClass().getSimpleName().equals(method.getClass().getSimpleName()))) {
+                source.add(method);
+            }
+        }
+    }
+
+    @Override
+    public void inspectInject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
+        Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
+        super.inspectInject(builderAssistant, mapperClass);
+        MPJTableMapperHelper.init(modelClass, mapperClass);
+        TableHelper.init(modelClass, extractModelClassOld(mapperClass));
+    }
+
+    public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
+        Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
+        return null == typeArguments ? null : typeArguments[index];
+    }
+
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
+    protected Class<?> extractModelClassOld(Class<?> mapperClass) {
+        Type[] types = mapperClass.getGenericInterfaces();
+        ParameterizedType target = null;
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                Type[] typeArray = ((ParameterizedType) type).getActualTypeArguments();
+                if (ArrayUtils.isNotEmpty(typeArray)) {
+                    for (Type t : typeArray) {
+                        if (t instanceof TypeVariable || t instanceof WildcardType) {
+                            break;
+                        } else {
+                            target = (ParameterizedType) type;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return target == null ? null : (Class<?>) target.getActualTypeArguments()[0];
+    }
+
 }  
 
 
