@@ -72,4 +72,75 @@ class SWTCursors {
         Display display = Display.getCurrent();
         return display != null ? display.getSystemCursor(id) : null;
     }
+
+
+    
+    /**
+     * 获取非lambda的resultMap
+     */
+    private ResultMap getDefaultResultMap(TableInfo tableInfo, MappedStatement ms, Class<?> resultType, String id) {
+        if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
+            //补充不全的属性 并且是基础数据类型及其包装类
+            ResultMap resultMap = ms.getConfiguration().getResultMap(tableInfo.getResultMap());
+            List<ResultMapping> resultMappings = resultMap.getResultMappings();
+            List<Field> fieldList = ReflectionKit.getFieldList(resultType);
+            fieldList.removeIf(i -> resultMappings.stream().anyMatch(r -> i.getName().equals(r.getProperty())));
+            if (CollectionUtils.isNotEmpty(fieldList)) {
+                //复制已有的resultMapping
+                List<ResultMapping> resultMappingList = new ArrayList<>(resultMappings);
+                //复制不存在的resultMapping
+                for (Field i : fieldList) {
+                    if (MPJReflectionKit.isPrimitiveOrWrapper(i.getType())) {
+                        resultMappingList.add(new ResultMapping.Builder(ms.getConfiguration(),
+                                i.getName(), i.getName(), i.getType()).build());
+                    }
+                }
+                return new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappingList).build();
+            }
+        }
+        return new ResultMap.Builder(ms.getConfiguration(), id, resultType, EMPTY_RESULT_MAPPING).build();
+    }
+
+
+    /**
+     * 往 Configuration 添加resultMap
+     */
+    private synchronized static void addResultMap(MappedStatement ms, String key, ResultMap resultMap) {
+        if (!ms.getConfiguration().hasResultMap(key)) {
+            ms.getConfiguration().addResultMap(resultMap);
+        }
+    }
+
+    private Class<?> getEntity(String id) {
+        try {
+            return Class.forName(id.substring(0, id.lastIndexOf(StringPool.DOT)));
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    private String removeDot(String str) {
+        if (StringUtils.isBlank(str)) {
+            return str;
+        } else {
+            return str.replaceAll("\\.", StringPool.DASH);
+        }
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        try {
+            return Interceptor.super.plugin(target);
+        } catch (Exception e) {
+            return Plugin.wrap(target, this);
+        }
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        try {
+            Interceptor.super.setProperties(properties);
+        } catch (Exception ignored) {
+        }
+    }
 }
