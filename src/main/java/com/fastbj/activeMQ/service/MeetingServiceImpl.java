@@ -106,6 +106,24 @@ public class MeetingServiceImpl implements IMeetingService
         return meetingMapper.updateMeeting(meeting);
     }
 
+
+    
+    public boolean isSuperColumn(String javaField)
+    {
+        return isSuperColumn(this.tplCategory, javaField);
+    }
+
+    public static boolean isSuperColumn(String tplCategory, String javaField)
+    {
+        if (isTree(tplCategory))
+        {
+            return StringUtils.equalsAnyIgnoreCase(javaField,
+                    ArrayUtils.addAll(GenConstants.TREE_ENTITY, GenConstants.BASE_ENTITY));
+        }
+        return StringUtils.equalsAnyIgnoreCase(javaField, GenConstants.BASE_ENTITY);
+    }
+
+    
     /**
      * 批量删除会议
      * 
