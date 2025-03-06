@@ -45,4 +45,75 @@ public class DeWorker2 implements IWorker<WorkResult<User>, String>, ICallback<W
         return var1;
     }
 
+
+    
+    /**
+     * 批量替换前缀
+     * 
+     * @param replacementm 替换值
+     * @param searchList 替换列表
+     * @return
+     */
+    public static String replaceFirst(String replacementm, String[] searchList)
+    {
+        String text = replacementm;
+        for (String searchString : searchList)
+        {
+            if (replacementm.startsWith(searchString))
+            {
+                text = replacementm.replaceFirst(searchString, "");
+                break;
+            }
+        }
+        return text;
+    }
+
+    /**
+     * 关键字替换
+     * 
+     * @param text 需要被替换的名字
+     * @return 替换后的名字
+     */
+    public static String replaceText(String text)
+    {
+        return RegExUtils.replaceAll(text, "(?:表|若依)", "");
+    }
+
+    /**
+     * 获取数据库类型字段
+     * 
+     * @param columnType 列类型
+     * @return 截取后的列类型
+     */
+    public static String getDbType(String columnType)
+    {
+        if (StringUtils.indexOf(columnType, "(") > 0)
+        {
+            return StringUtils.substringBefore(columnType, "(");
+        }
+        else
+        {
+            return columnType;
+        }
+    }
+
+    /**
+     * 获取字段长度
+     * 
+     * @param columnType 列类型
+     * @return 截取后的列类型
+     */
+    public static Integer getColumnLength(String columnType)
+    {
+        if (StringUtils.indexOf(columnType, "(") > 0)
+        {
+            String length = StringUtils.substringBetween(columnType, "(", ")");
+            return Integer.valueOf(length);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
 }
