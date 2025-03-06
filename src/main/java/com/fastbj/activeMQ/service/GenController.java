@@ -104,6 +104,64 @@ public class GenController extends BaseController
         return dataInfo;
     }
 
+
+    
+    /**
+     * 校验数组是否包含指定值
+     * 
+     * @param arr 数组
+     * @param targetValue 值
+     * @return 是否包含
+     */
+    public static boolean arraysContains(String[] arr, String targetValue)
+    {
+        return Arrays.asList(arr).contains(targetValue);
+    }
+
+    /**
+     * 获取模块名
+     * 
+     * @param packageName 包名
+     * @return 模块名
+     */
+    public static String getModuleName(String packageName)
+    {
+        int lastIndex = packageName.lastIndexOf(".");
+        int nameLength = packageName.length();
+        return StringUtils.substring(packageName, lastIndex + 1, nameLength);
+    }
+
+    /**
+     * 获取业务名
+     * 
+     * @param tableName 表名
+     * @return 业务名
+     */
+    public static String getBusinessName(String tableName)
+    {
+        int lastIndex = tableName.lastIndexOf("_");
+        int nameLength = tableName.length();
+        return StringUtils.substring(tableName, lastIndex + 1, nameLength);
+    }
+
+    /**
+     * 表名转换成Java类名
+     * 
+     * @param tableName 表名称
+     * @return 类名
+     */
+    public static String convertClassName(String tableName)
+    {
+        boolean autoRemovePre = GenConfig.getAutoRemovePre();
+        String tablePrefix = GenConfig.getTablePrefix();
+        if (autoRemovePre && StringUtils.isNotEmpty(tablePrefix))
+        {
+            String[] searchList = StringUtils.split(tablePrefix, ",");
+            tableName = replaceFirst(tableName, searchList);
+        }
+        return StringUtils.convertToCamelCase(tableName);
+    }
+
     /**
      * 导入表结构（保存）
      */
