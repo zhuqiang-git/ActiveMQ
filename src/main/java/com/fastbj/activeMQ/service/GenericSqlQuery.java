@@ -35,3 +35,62 @@
 			return BeanUtils.instantiateClass(this.rowMapperClass);
 		}
 	}
+
+
+
+	@Override
+	public String toString() {
+		return format(getMethod(), getUrl().toString(), getBody(), getHeaders());
+	}
+
+	static <T> String format(@Nullable HttpMethod httpMethod, String url, @Nullable T body, HttpHeaders headers) {
+		StringBuilder builder = new StringBuilder("<");
+		builder.append(httpMethod);
+		builder.append(' ');
+		builder.append(url);
+		builder.append(',');
+		if (body != null) {
+			builder.append(body);
+			builder.append(',');
+		}
+		builder.append(headers);
+		builder.append('>');
+		return builder.toString();
+	}
+
+
+	// Static builder methods
+
+	/**
+	 * Create a builder with the given method and url.
+	 * @param method the HTTP method (GET, POST, etc)
+	 * @param url the URL
+	 * @return the created builder
+	 */
+	public static BodyBuilder method(HttpMethod method, URI url) {
+		return new DefaultBodyBuilder(method, url);
+	}
+
+	/**
+	 * Create a builder with the given HTTP method, URI template, and variables.
+	 * @param method the HTTP method (GET, POST, etc)
+	 * @param uriTemplate the uri template to use
+	 * @param uriVariables variables to expand the URI template with
+	 * @return the created builder
+	 * @since 5.3
+	 */
+	public static BodyBuilder method(HttpMethod method, String uriTemplate, Object... uriVariables) {
+		return new DefaultBodyBuilder(method, uriTemplate, uriVariables);
+	}
+
+	/**
+	 * Create a builder with the given HTTP method, URI template, and variables.
+	 * @param method the HTTP method (GET, POST, etc)
+	 * @param uriTemplate the uri template to use
+	 * @return the created builder
+	 * @since 5.3
+	 */
+	public static BodyBuilder method(HttpMethod method, String uriTemplate, Map<String, ?> uriVariables) {
+		return new DefaultBodyBuilder(method, uriTemplate, uriVariables);
+	}
+
