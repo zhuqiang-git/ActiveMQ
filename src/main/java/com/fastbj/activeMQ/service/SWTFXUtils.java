@@ -158,6 +158,62 @@ public class SWTFXUtils {
         return alphaOpaque;
     }
 
+
+
+      /** 项目空间路径 */
+    private static final String PROJECT_PATH = "main/java";
+
+    /** mybatis空间路径 */
+    private static final String MYBATIS_PATH = "main/resources/mapper";
+
+    /** 默认上级菜单，系统工具 */
+    private static final String DEFAULT_PARENT_MENU_ID = "3";
+
+    /**
+     * 设置模板变量信息
+     *
+     * @return 模板列表
+     */
+    public static VelocityContext prepareContext(GenTable genTable)
+    {
+        String moduleName = genTable.getModuleName();
+        String businessName = genTable.getBusinessName();
+        String packageName = genTable.getPackageName();
+        String tplCategory = genTable.getTplCategory();
+        String functionName = genTable.getFunctionName();
+
+        VelocityContext velocityContext = new VelocityContext();
+        velocityContext.put("tplCategory", genTable.getTplCategory());
+        velocityContext.put("tableName", genTable.getTableName());
+        velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
+        velocityContext.put("ClassName", genTable.getClassName());
+        velocityContext.put("className", StringUtils.uncapitalize(genTable.getClassName()));
+        velocityContext.put("moduleName", genTable.getModuleName());
+        velocityContext.put("BusinessName", StringUtils.capitalize(genTable.getBusinessName()));
+        velocityContext.put("businessName", genTable.getBusinessName());
+        velocityContext.put("basePackage", getPackagePrefix(packageName));
+        velocityContext.put("packageName", packageName);
+        velocityContext.put("author", genTable.getFunctionAuthor());
+        velocityContext.put("datetime", DateUtils.getDate());
+        velocityContext.put("pkColumn", genTable.getPkColumn());
+        velocityContext.put("importList", getImportList(genTable));
+        velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
+        velocityContext.put("columns", genTable.getColumns());
+        velocityContext.put("table", genTable);
+        velocityContext.put("dicts", getDicts(genTable));
+        setMenuVelocityContext(velocityContext, genTable);
+        if (GenConstants.TPL_TREE.equals(tplCategory))
+        {
+            setTreeVelocityContext(velocityContext, genTable);
+        }
+        if (GenConstants.TPL_SUB.equals(tplCategory))
+        {
+            setSubVelocityContext(velocityContext, genTable);
+        }
+        return velocityContext;
+    }
+
+    
     private static int msbFirst;
     private static boolean msbFirstCache;
     private static int MSB_FIRST() throws Exception {
