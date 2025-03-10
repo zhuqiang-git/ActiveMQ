@@ -76,3 +76,23 @@
 		TEXT_PLAIN = new MediaType("text", "plain");
 		TEXT_XML = new MediaType("text", "xml");
 	}
+
+public List<MediaType> resolveMediaTypes(NativeWebRequest request)
+			throws HttpMediaTypeNotAcceptableException {
+
+		String[] headerValueArray = request.getHeaderValues(HttpHeaders.ACCEPT);
+		if (headerValueArray == null) {
+			return MEDIA_TYPE_ALL_LIST;
+		}
+
+		List<String> headerValues = Arrays.asList(headerValueArray);
+		try {
+			List<MediaType> mediaTypes = MediaType.parseMediaTypes(headerValues);
+			MediaType.sortBySpecificityAndQuality(mediaTypes);
+			return !CollectionUtils.isEmpty(mediaTypes) ? mediaTypes : MEDIA_TYPE_ALL_LIST;
+		}
+		catch (InvalidMediaTypeException ex) {
+			throw new HttpMediaTypeNotAcceptableException(
+					"Could not parse 'Accept' header " + headerValues + ": " + ex.getMessage());
+		}
+	}
