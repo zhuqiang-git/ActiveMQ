@@ -26,4 +26,49 @@ public @interface API {
         private Status() {
         }
     }
+
+	public List<MediaType> resolveMediaTypes(NativeWebRequest request) throws HttpMediaTypeNotAcceptableException {
+		for (ContentNegotiationStrategy strategy : this.strategies) {
+			List<MediaType> mediaTypes = strategy.resolveMediaTypes(request);
+			if (mediaTypes.equals(MEDIA_TYPE_ALL_LIST)) {
+				continue;
+			}
+			return mediaTypes;
+		}
+		return MEDIA_TYPE_ALL_LIST;
+	}
+
+
+	private List<String> doResolveExtensions(Function<MediaTypeFileExtensionResolver, List<String>> extractor) {
+		List<String> result = null;
+		for (MediaTypeFileExtensionResolver resolver : this.resolvers) {
+			List<String> extensions = extractor.apply(resolver);
+			if (CollectionUtils.isEmpty(extensions)) {
+				continue;
+			}
+			result = (result != null ? result : new ArrayList<>(4));
+			for (String extension : extensions) {
+				if (!result.contains(extension)) {
+					result.add(extension);
+				}
+			}
+		}
+		return (result != null ? result : Collections.emptyList());
+	}
+
+
+	public Map<String, MediaType> getMediaTypeMappings() {
+		Map<String, MediaType> result = null;
+		for (MediaTypeFileExtensionResolver resolver : this.resolvers) {
+			if (resolver instanceof MappingMediaTypeFileExtensionResolver) {
+				Map<String, MediaType> map = ((MappingMediaTypeFileExtensionResolver) resolver).getMediaTypes();
+				if (CollectionUtils.isEmpty(map)) {
+					continue;
+				}
+				result = (result != null ? result : new HashMap<>(4));
+				result.putAll(map);
+			}
+		}
+		return (result != null ? result : Collections.emptyMap());
+	}
 }
