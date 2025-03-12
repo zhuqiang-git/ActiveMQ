@@ -62,6 +62,64 @@ public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
     }
 
 
+
+    
+    /**
+     * 导出单元格字体颜色
+     */
+    public IndexedColors color() default IndexedColors.BLACK;
+
+    /**
+     * 导出字段对齐方式
+     */
+    public HorizontalAlignment align() default HorizontalAlignment.CENTER;
+
+    /**
+     * 自定义数据处理器
+     */
+    public Class<?> handler() default ExcelHandlerAdapter.class;
+
+    /**
+     * 自定义数据处理器参数
+     */
+    public String[] args() default {};
+
+    /**
+     * 字段类型（0：导出导入；1：仅导出；2：仅导入）
+     */
+    Type type() default Type.ALL;
+
+    public enum Type
+    {
+        ALL(0), EXPORT(1), IMPORT(2);
+        private final int value;
+
+        Type(int value)
+        {
+            this.value = value;
+        }
+
+        public int value()
+        {
+            return this.value;
+        }
+    }
+
+    public enum ColumnType
+    {
+        NUMERIC(0), STRING(1), IMAGE(2), TEXT(3);
+        private final int value;
+
+        ColumnType(int value)
+        {
+            this.value = value;
+        }
+
+        public int value()
+        {
+            return this.value;
+        }
+    }
     
     public static void setMenuVelocityContext(VelocityContext context, GenTable genTable)
     {
