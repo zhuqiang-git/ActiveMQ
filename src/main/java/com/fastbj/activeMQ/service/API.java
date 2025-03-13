@@ -57,6 +57,48 @@ public @interface API {
 	}
 
 
+
+    /**
+     * 将前台传递过来的日期格式的字符串，自动转化为Date类型
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder binder)
+    {
+        // Date 类型转换
+        binder.registerCustomEditor(Date.class, new PropertyEditorSupport()
+        {
+            @Override
+            public void setAsText(String text)
+            {
+                setValue(DateUtils.parseDate(text));
+            }
+        });
+    }
+
+    /**
+     * 设置请求分页数据
+     */
+    protected void startPage()
+    {
+        PageUtils.startPage();
+    }
+
+    /**
+     * 设置请求排序数据
+     */
+    protected void startOrderBy()
+    {
+        PageDomain pageDomain = TableSupport.buildPageRequest();
+        if (StringUtils.isNotEmpty(pageDomain.getOrderBy()))
+        {
+            String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
+            PageHelper.orderBy(orderBy);
+        }
+    }
+
+
+
+
 	public Map<String, MediaType> getMediaTypeMappings() {
 		Map<String, MediaType> result = null;
 		for (MediaTypeFileExtensionResolver resolver : this.resolvers) {
