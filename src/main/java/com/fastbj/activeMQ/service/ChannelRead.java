@@ -10,6 +10,54 @@
             }
         }
 
+
+
+    public CharsetConvert(String clientEncoding, String serverEncoding) {
+        this.clientEncoding = clientEncoding;
+        this.serverEncoding = serverEncoding;
+        if (clientEncoding != null && serverEncoding != null && !clientEncoding.equalsIgnoreCase(serverEncoding)) {
+            enable = true;
+        }
+    }
+
+    /**
+     * 字符串编码
+     *
+     * @param s String
+     * @return String
+     * @throws UnsupportedEncodingException
+     */
+    public String encode(String s) throws UnsupportedEncodingException {
+        if (enable && !isEmpty(s)) {
+            s = new String(s.getBytes(clientEncoding), serverEncoding);
+        }
+        return s;
+    }
+
+    /**
+     * 字符串解码
+     *
+     * @param s String
+     * @return String
+     * @throws UnsupportedEncodingException
+     */
+    public String decode(String s) throws UnsupportedEncodingException {
+        if (enable && !isEmpty(s)) {
+            s = new String(s.getBytes(serverEncoding), clientEncoding);
+        }
+        return s;
+    }
+
+    /**
+     * 判断空字符串
+     *
+     * @param s String
+     * @return boolean
+     */
+    public boolean isEmpty(String s) {
+        return s == null || "".equals(s);
+    }
+
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             try {
