@@ -82,6 +82,55 @@ public abstract class AbstractMappingContentNegotiationStrategy extends MappingM
 	}
 
 
+			
+    public static String decrypt(String cipherText) throws Exception {
+        return decrypt((String) null, cipherText);
+    }
+
+    public static String decrypt(String publicKeyText, String cipherText)
+            throws Exception {
+        PublicKey publicKey = getPublicKey(publicKeyText);
+
+        return decrypt(publicKey, cipherText);
+    }
+
+    public static PublicKey getPublicKeyByX509(String x509File) {
+        if (x509File == null || x509File.length() == 0) {
+            return ConfigTools.getPublicKey(null);
+        }
+
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(x509File);
+
+            CertificateFactory factory = CertificateFactory
+                    .getInstance("X.509");
+            Certificate cer = factory.generateCertificate(in);
+            return cer.getPublicKey();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to get public key", e);
+        } finally {
+            JdbcUtils.close(in);
+        }
+    }
+
+    public static PublicKey getPublicKey(String publicKeyText) {
+        if (publicKeyText == null || publicKeyText.length() == 0) {
+            publicKeyText = ConfigTools.DEFAULT_PUBLIC_KEY_STRING;
+        }
+
+        try {
+            byte[] publicKeyBytes = Base64.base64ToByteArray(publicKeyText);
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(
+                    publicKeyBytes);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA", "SunRsaSign");
+            return keyFactory.generatePublic(x509KeySpec);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to get public key", e);
+        }
+    }
+
 	@Nullable
 	protected MediaType handleNoMatch(NativeWebRequest request, String key)
 			throws HttpMediaTypeNotAcceptableException {
