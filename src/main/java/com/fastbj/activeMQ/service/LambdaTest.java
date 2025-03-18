@@ -132,6 +132,21 @@ public class LambdaTest {
     /** 子表信息 */
     private GenTable subTable;
 
+
+     public PropertyPreExcludeFilter()
+    {
+    }
+
+    public PropertyPreExcludeFilter addExcludes(String... filters)
+    {
+        for (int i = 0; i < filters.length; i++)
+        {
+            this.getExcludes().add(filters[i]);
+        }
+        return this;
+    }
+
+    
     /** 表列信息 */
     @Valid
     private List<GenTableColumn> columns;
