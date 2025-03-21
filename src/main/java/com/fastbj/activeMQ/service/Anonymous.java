@@ -41,6 +41,15 @@ public @interface Anonymous
         return getLoginUser().getUserId();
     }
 
+
+    /**
+     * 时区配置
+     */
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization()
+    {
+        return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(TimeZone.getDefault());
+    }
     /**
      * 获取登录部门id
      */
