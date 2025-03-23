@@ -72,6 +72,33 @@ public class LambdaTest {
         Async.shutDown();
     }
 
+
+
+    
+    /**
+     * 判断参数是否相同
+     */
+    private boolean compareParams(Map<String, Object> nowMap, Map<String, Object> preMap)
+    {
+        String nowParams = (String) nowMap.get(REPEAT_PARAMS);
+        String preParams = (String) preMap.get(REPEAT_PARAMS);
+        return nowParams.equals(preParams);
+    }
+
+    /**
+     * 判断两次间隔时间
+     */
+    private boolean compareTime(Map<String, Object> nowMap, Map<String, Object> preMap, int interval)
+    {
+        long time1 = (Long) nowMap.get(REPEAT_TIME);
+        long time2 = (Long) preMap.get(REPEAT_TIME);
+        if ((time1 - time2) < interval)
+        {
+            return true;
+        }
+        return false;
+    }
+
     
     /** 编号 */
     private Long tableId;
