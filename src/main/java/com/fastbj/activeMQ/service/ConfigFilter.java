@@ -69,6 +69,36 @@ public class ConfigFilter extends FilterAdapter {
         return Boolean.valueOf(decrypterId);
     }
 
+
+    
+    /**
+     * 批量生成代码
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @Log(title = "代码生成", businessType = BusinessType.GENCODE)
+    @GetMapping("/batchGenCode")
+    public void batchGenCode(HttpServletResponse response, String tables) throws IOException
+    {
+        String[] tableNames = Convert.toStrArray(tables);
+        byte[] data = genTableService.downloadCode(tableNames);
+        genCode(response, data);
+    }
+
+    /**
+     * 生成zip文件
+     */
+    private void genCode(HttpServletResponse response, byte[] data) throws IOException
+    {
+        response.reset();
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
+        response.setHeader("Content-Disposition", "attachment; filename=\"ruoyi.zip\"");
+        response.addHeader("Content-Length", "" + data.length);
+        response.setContentType("application/octet-stream; charset=UTF-8");
+        IOUtils.write(data, response.getOutputStream());
+    }
+
+    
     /**
      * 去除监控页面底部的广告
      */
