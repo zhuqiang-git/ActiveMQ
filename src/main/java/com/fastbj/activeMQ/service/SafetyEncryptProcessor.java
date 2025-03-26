@@ -208,5 +208,85 @@ public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
     }
 
 
+
+    
+    /**
+     * 查询数据库列表
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @GetMapping("/db/list")
+    public TableDataInfo dataList(GenTable genTable)
+    {
+        startPage();
+        List<GenTable> list = genTableService.selectDbTableList(genTable);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询数据表字段列表
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @GetMapping(value = "/column/{tableId}")
+    public TableDataInfo columnList(Long tableId)
+    {
+        TableDataInfo dataInfo = new TableDataInfo();
+        List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(tableId);
+        dataInfo.setRows(list);
+        dataInfo.setTotal(list.size());
+        return dataInfo;
+    }
+
+    /**
+     * 导入表结构（保存）
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:import')")
+    @Log(title = "代码生成", businessType = BusinessType.IMPORT)
+    @PostMapping("/importTable")
+    public AjaxResult importTableSave(String tables)
+    {
+        String[] tableNames = Convert.toStrArray(tables);
+        // 查询表信息
+        List<GenTable> tableList = genTableService.selectDbTableListByNames(tableNames);
+        genTableService.importGenTable(tableList, SecurityUtils.getUsername());
+        return success();
+    }
+
+    /**
+     * 创建表结构（保存）
+     */
+    @PreAuthorize("@ss.hasRole('admin')")
+    @Log(title = "创建表", businessType = BusinessType.OTHER)
+    @PostMapping("/createTable")
+    public AjaxResult createTableSave(String sql)
+    {
+        try
+        {
+            SqlUtil.filterKeyword(sql);
+            List<SQLStatement> sqlStatements = SQLUtils.parseStatements(sql, DbType.mysql);
+            List<String> tableNames = new ArrayList<>();
+            for (SQLStatement sqlStatement : sqlStatements)
+            {
+                if (sqlStatement instanceof MySqlCreateTableStatement)
+                {
+                    MySqlCreateTableStatement createTableStatement = (MySqlCreateTableStatement) sqlStatement;
+                    if (genTableService.createTable(createTableStatement.toString()))
+                    {
+                        String tableName = createTableStatement.getTableName().replaceAll("`", "");
+                        tableNames.add(tableName);
+                    }
+                }
+            }
+            List<GenTable> tableList = genTableService.selectDbTableListByNames(tableNames.toArray(new String[tableNames.size()]));
+            String operName = SecurityUtils.getUsername();
+            genTableService.importGenTable(tableList, operName);
+            return AjaxResult.success();
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage(), e);
+            return AjaxResult.error("创建表结构异常");
+        }
+    }
+
     
 }
