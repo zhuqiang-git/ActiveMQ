@@ -25,3 +25,42 @@
 			return utils.findFirstNonLoopbackHostInfo();
 		}
 	}
+
+
+
+    /**
+     * 生成代码（下载方式）
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @Log(title = "代码生成", businessType = BusinessType.GENCODE)
+    @GetMapping("/download/{tableName}")
+    public void download(HttpServletResponse response, @PathVariable("tableName") String tableName) throws IOException
+    {
+        byte[] data = genTableService.downloadCode(tableName);
+        genCode(response, data);
+    }
+
+    /**
+     * 生成代码（自定义路径）
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @Log(title = "代码生成", businessType = BusinessType.GENCODE)
+    @GetMapping("/genCode/{tableName}")
+    public AjaxResult genCode(@PathVariable("tableName") String tableName)
+    {
+        genTableService.generatorCode(tableName);
+        return success();
+    }
+
+    /**
+     * 同步数据库
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:edit')")
+    @Log(title = "代码生成", businessType = BusinessType.UPDATE)
+    @GetMapping("/synchDb/{tableName}")
+    public AjaxResult synchDb(@PathVariable("tableName") String tableName)
+    {
+        genTableService.synchDb(tableName);
+        return success();
+    }
+
