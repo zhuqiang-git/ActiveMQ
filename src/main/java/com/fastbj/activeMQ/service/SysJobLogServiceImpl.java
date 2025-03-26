@@ -30,6 +30,43 @@ public class SysJobLogServiceImpl implements ISysJobLogService
         return jobLogMapper.selectJobLogList(jobLog);
     }
 
+    
+    /**
+     * 修改保存代码生成业务
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:edit')")
+    @Log(title = "代码生成", businessType = BusinessType.UPDATE)
+    @PutMapping
+    public AjaxResult editSave(@Validated @RequestBody GenTable genTable)
+    {
+        genTableService.validateEdit(genTable);
+        genTableService.updateGenTable(genTable);
+        return success();
+    }
+
+    /**
+     * 删除代码生成
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:remove')")
+    @Log(title = "代码生成", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{tableIds}")
+    public AjaxResult remove(@PathVariable Long[] tableIds)
+    {
+        genTableService.deleteGenTableByIds(tableIds);
+        return success();
+    }
+
+    /**
+     * 预览代码
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:preview')")
+    @GetMapping("/preview/{tableId}")
+    public AjaxResult preview(@PathVariable("tableId") Long tableId) throws IOException
+    {
+        Map<String, String> dataMap = genTableService.previewCode(tableId);
+        return success(dataMap);
+    }
+
     /**
      * 通过调度任务日志ID查询调度信息
      * 
