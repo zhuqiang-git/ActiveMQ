@@ -49,6 +49,60 @@ public class GenController extends BaseController
     @Autowired
     private IGenTableColumnService genTableColumnService;
 
+
+
+    public static final String NACOS_CONSOLE_AUTH_SCOPE = ApiType.CONSOLE_API.name();
+
+    /**
+     * Whether console auth enabled.
+     */
+    private boolean authEnabled;
+
+    /**
+     * Which auth system is in use.
+     */
+    private String nacosAuthSystemType;
+
+    private String serverIdentityKey;
+
+    private String serverIdentityValue;
+
+    public NacosConsoleAuthConfig() {
+        super("NacosConsoleAuth");
+        resetConfig();
+    }
+
+    @Override
+    public String getAuthScope() {
+        return NACOS_CONSOLE_AUTH_SCOPE;
+    }
+
+    @Override
+    public boolean isAuthEnabled() {
+        return authEnabled;
+    }
+
+    @Override
+    public String getNacosAuthSystemType() {
+        return nacosAuthSystemType;
+    }
+
+    @Override
+    public boolean isSupportServerIdentity() {
+        return StringUtils.isNotBlank(serverIdentityKey) && StringUtils.isNotBlank(serverIdentityValue);
+    }
+
+    @Override
+    public String getServerIdentityKey() {
+        return serverIdentityKey;
+    }
+
+    @Override
+    public String getServerIdentityValue() {
+        return serverIdentityValue;
+    }
+
+
     /**
      * 查询代码生成列表
      */
