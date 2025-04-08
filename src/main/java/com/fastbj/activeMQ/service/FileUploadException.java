@@ -11,6 +11,22 @@ import java.io.PrintWriter;
 public class FileUploadException extends Exception
 {
 
+
+
+    public static final String AUTH_MODULE = "console_auth";
+
+    public static final String AUTH_ENABLED = "auth_enabled";
+
+    public static final String LOGIN_PAGE_ENABLED = "login_page_enabled";
+
+    public static final String AUTH_SYSTEM_TYPE = "auth_system_type";
+
+    public static final String AUTH_ADMIN_REQUEST = "auth_admin_request";
+
+    private boolean cacheable;
+
+
+
     private static final long serialVersionUID = 1L;
 
     private final Throwable cause;
