@@ -103,6 +103,52 @@ public class GenController extends BaseController
     }
 
 
+
+    private final HistoryHandler historyHandler;
+
+    /**
+     * Constructs a new HistoryProxy with the given HistoryInnerHandler and ConsoleConfig.
+     *
+     * @param historyHandler the default implementation of HistoryHandler
+     */
+    @Autowired
+    public HistoryProxy(HistoryHandler historyHandler) {
+        this.historyHandler = historyHandler;
+    }
+
+    /**
+     * Query the detailed configuration history information.
+     *
+     * @param dataId      the ID of the data
+     * @param group       the group ID
+     * @param namespaceId the namespace ID
+     * @param nid         the history record ID
+     * @return the detailed configuration history information
+     * @throws NacosException if any error occurs during the operation
+     */
+    public ConfigHistoryDetailInfo getConfigHistoryInfo(String dataId, String group, String namespaceId, Long nid)
+            throws NacosException {
+        return historyHandler.getConfigHistoryInfo(dataId, group, namespaceId, nid);
+    }
+
+    /**
+     * Query the list of configuration history.
+     *
+     * @param dataId      the ID of the data
+     * @param group       the group ID
+     * @param namespaceId the namespace ID
+     * @param pageNo      the page number
+     * @param pageSize    the number of items per page
+     * @return the paginated list of configuration history
+     * @throws NacosException if any error occurs during the operation
+     */
+    public Page<ConfigHistoryBasicInfo> listConfigHistory(String dataId, String group, String namespaceId, Integer pageNo,
+                                                          Integer pageSize) throws NacosException {
+        return historyHandler.listConfigHistory(dataId, group, namespaceId, pageNo, pageSize);
+    }
+
+
+
     /**
      * 查询代码生成列表
      */

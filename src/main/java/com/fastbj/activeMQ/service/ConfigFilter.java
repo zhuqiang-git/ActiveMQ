@@ -8,6 +8,8 @@ import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
 import com.alibaba.druid.util.JdbcUtils;
 import com.alibaba.druid.util.StringUtils;
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,6 +27,51 @@ public class ConfigFilter extends FilterAdapter {
     public static final String SYS_PROP_CONFIG_FILE = "druid.config.file";
     public static final String SYS_PROP_CONFIG_DECRYPT = "druid.config.decrypt";
     public static final String SYS_PROP_CONFIG_KEY = "druid.config.decrypt.key";
+
+
+
+    @Override
+    public void injectEnvironment(ConfigurableEnvironment environment) {
+        if (isConsoleDeploymentType) {
+            EnvUtil.setEnvironment(environment);
+        }
+    }
+
+    @Override
+    public void loadPreProperties(ConfigurableEnvironment environment) {
+        if (isConsoleDeploymentType) {
+            try {
+                SOURCES.putAll(EnvUtil.loadProperties(EnvUtil.getApplicationConfFileResource()));
+                environment.getPropertySources()
+                        .addLast(new OriginTrackedMapPropertySource(NACOS_APPLICATION_CONF, SOURCES));
+            } catch (Exception e) {
+                throw new NacosRuntimeException(NacosException.SERVER_ERROR, e);
+            }
+        }
+    }
+
+    @Override
+    public void initSystemProperty() {
+        if (isConsoleDeploymentType) {
+            System.setProperty(LOCAL_IP_PROPERTY_KEY, InetUtils.getSelfIP());
+            System.setProperty(MODE_PROPERTY_KEY_STAND_MODE, NACOS_MODE_STAND_ALONE);
+            if (EnvUtil.getFunctionMode() == null) {
+                System.setProperty(MODE_PROPERTY_KEY_FUNCTION_MODE, DEFAULT_FUNCTION_MODE);
+            } else if (EnvUtil.FUNCTION_MODE_CONFIG.equals(EnvUtil.getFunctionMode())) {
+                System.setProperty(MODE_PROPERTY_KEY_FUNCTION_MODE, EnvUtil.FUNCTION_MODE_CONFIG);
+            } else if (EnvUtil.FUNCTION_MODE_NAMING.equals(EnvUtil.getFunctionMode())) {
+                System.setProperty(MODE_PROPERTY_KEY_FUNCTION_MODE, EnvUtil.FUNCTION_MODE_NAMING);
+            }
+        }
+    }
+
+    @Override
+    public void logStarted(Logger logger) {
+        long endTimestamp = System.currentTimeMillis();
+        long startupCost = endTimestamp - getStartTimestamp();
+        logger.info("Nacos Console started successfully in {} ms", startupCost);
+    }
+
 
     public ConfigFilter() {
     }
