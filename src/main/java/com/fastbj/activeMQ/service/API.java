@@ -1,5 +1,7 @@
 
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,6 +13,38 @@ import java.lang.annotation.Target;
 @Documented
 public @interface API {
     Status status();
+
+
+
+    @Value("${nacos.cmdb.dumpTaskInterval:3600}")
+    private int dumpTaskInterval;
+
+    @Value("${nacos.cmdb.eventTaskInterval:10}")
+    private int eventTaskInterval;
+
+    @Value("${nacos.cmdb.labelTaskInterval:300}")
+    private int labelTaskInterval;
+
+    @Value("${nacos.cmdb.loadDataAtStart:false}")
+    private boolean loadDataAtStart;
+
+    public int getDumpTaskInterval() {
+        return dumpTaskInterval;
+    }
+
+    public int getEventTaskInterval() {
+        return eventTaskInterval;
+    }
+
+    public int getLabelTaskInterval() {
+        return labelTaskInterval;
+    }
+
+    public boolean isLoadDataAtStart() {
+        return loadDataAtStart;
+    }
+
+
 
     String since() default "";
 
