@@ -5,13 +5,100 @@ import com.jd.platform.async.callback.ICallback;
 import com.jd.platform.async.callback.IWorker;
 import com.jd.platform.async.worker.WorkResult;
 import com.jd.platform.async.wrapper.WorkerWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
 public class DeWorker2 implements IWorker<WorkResult<User>, String>, ICallback<WorkResult<User>, String> {
+
+
+
+    @Autowired
+    private SwitchAndOptions switches;
+
+    private CmdbService cmdbService;
+
+    private final Collection<CmdbService> services = NacosServiceLoader.load(CmdbService.class);
+
+    private Map<String, Map<String, Entity>> entityMap = new ConcurrentHashMap<>();
+
+    private Map<String, Label> labelMap = new ConcurrentHashMap<>();
+
+    private Set<String> entityTypeSet = new HashSet<>();
+
+    private long eventTimestamp = System.currentTimeMillis();
+
+    public CmdbProvider() throws NacosException {
+    }
+
+    private void initCmdbService() throws NacosException {
+        Iterator<CmdbService> iterator = services.iterator();
+        if (iterator.hasNext()) {
+            cmdbService = iterator.next();
+        }
+
+        if (cmdbService == null && switches.isLoadDataAtStart()) {
+            throw new NacosException(NacosException.SERVER_ERROR, "Cannot initialize CmdbService!");
+        }
+    }
+
+    /**
+     * load data.
+     */
+    public void load() {
+
+        if (!switches.isLoadDataAtStart()) {
+            return;
+        }
+
+        // init label map:
+        Set<String> labelNames = cmdbService.getLabelNames();
+        if (labelNames == null || labelNames.isEmpty()) {
+            Loggers.MAIN.warn("[LOAD] init label names failed!");
+        } else {
+            for (String labelName : labelNames) {
+                // If get null label, it's still ok. We will try it later when we meet this label:
+                labelMap.put(labelName, cmdbService.getLabel(labelName));
+            }
+        }
+
+        // init entity type set:
+        entityTypeSet = cmdbService.getEntityTypes();
+
+        // init entity map:
+        entityMap = cmdbService.getAllEntities();
+    }
+
+    /**
+     * Init, called by spring.
+     *
+     * @throws NacosException nacos exception
+     */
+    @PostConstruct
+    public void init() throws NacosException {
+
+        initCmdbService();
+        load();
+
+        CmdbExecutor.scheduleCmdbTask(new CmdbDumpTask(), switches.getDumpTaskInterval(), TimeUnit.SECONDS);
+        CmdbExecutor.scheduleCmdbTask(new CmdbLabelTask(), switches.getLabelTaskInterval(), TimeUnit.SECONDS);
+        CmdbExecutor.scheduleCmdbTask(new CmdbEventTask(), switches.getEventTaskInterval(), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public Entity queryEntity(String entityName, String entityType) {
+        if (!entityMap.containsKey(entityType)) {
+            return null;
+        }
+        return entityMap.get(entityType).get(entityName);
+    }
+
 
     @Override
     public String action(WorkResult<User> result, Map<String, WorkerWrapper> allWrappers) {
