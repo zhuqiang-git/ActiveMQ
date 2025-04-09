@@ -1,9 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import com.ruoyi.system.mapper.PurchaseMapper;
 import org.activiti.engine.HistoryService;
@@ -34,6 +31,42 @@ public class MeetingServiceImpl implements IMeetingService
 {
     @Autowired
     private MeetingMapper meetingMapper;
+
+
+    private final ClusterHandler clusterHandler;
+
+    /**
+     * Constructs a new ClusterProxy with the given ClusterInnerHandler and ConsoleConfig.
+     *
+     * @param clusterHandler the default implementation of ClusterHandler
+     */
+    public ClusterProxy(ClusterHandler clusterHandler) {
+        this.clusterHandler = clusterHandler;
+    }
+
+    /**
+     * Retrieve a list of cluster members with an optional search keyword.
+     *
+     * @param ipKeyWord the search keyword for filtering members
+     * @return a collection of matching members
+     * @throws IllegalArgumentException if the deployment type is invalid
+     */
+    public Collection<NacosMember> getNodeList(String ipKeyWord) throws NacosException {
+        Collection<? extends NacosMember> members = clusterHandler.getNodeList(ipKeyWord);
+        List<NacosMember> result = new ArrayList<>();
+        members.forEach(member -> {
+            if (StringUtils.isBlank(ipKeyWord)) {
+                result.add(member);
+                return;
+            }
+            final String address = member.getAddress();
+            if (StringUtils.equals(address, ipKeyWord) || StringUtils.startsWith(address, ipKeyWord)) {
+                result.add(member);
+            }
+        });
+        result.sort(Comparator.comparing(NacosMember::getAddress));
+        return result;
+    }
 
     @Autowired
     private PurchaseMapper purchaseMapper;
