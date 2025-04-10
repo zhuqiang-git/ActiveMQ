@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,50 @@ public class SysConfigServiceImpl implements ISysConfigService
         return StringUtils.EMPTY;
     }
 
+
+    public class CmdbEventTask implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+
+                Loggers.MAIN.debug("EVENT-TASK {}", "start dump.");
+
+                if (cmdbService == null) {
+                    return;
+                }
+
+                long current = System.currentTimeMillis();
+                List<EntityEvent> events = cmdbService.getEntityEvents(eventTimestamp);
+                eventTimestamp = current;
+
+                if (Loggers.MAIN.isDebugEnabled()) {
+                    Loggers.MAIN.debug("EVENT-TASK {}", "got events size:" + ", events:" + JacksonUtils.toJson(events));
+                }
+
+                if (events != null && !events.isEmpty()) {
+
+                    for (EntityEvent event : events) {
+                        switch (event.getType()) {
+                            case ENTITY_REMOVE:
+                                removeEntity(event.getEntityName(), event.getEntityType());
+                                break;
+                            case ENTITY_ADD_OR_UPDATE:
+                                updateEntity(cmdbService.getEntity(event.getEntityName(), event.getEntityType()));
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                Loggers.MAIN.error("CMDB-EVENT {}", "event task failed!", e);
+            } finally {
+                CmdbExecutor.scheduleCmdbTask(this, switches.getEventTaskInterval(), TimeUnit.SECONDS);
+            }
+        }
+    }
 
      /**
      * 记录登录信息
