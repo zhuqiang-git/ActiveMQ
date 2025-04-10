@@ -1,4 +1,10 @@
-	public int update(Object[] params, KeyHolder generatedKeyHolder) throws DataAccessException {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+public int update(Object[] params, KeyHolder generatedKeyHolder) throws DataAccessException {
 		if (!isReturnGeneratedKeys() && getGeneratedKeysColumnNames() == null) {
 			throw new InvalidDataAccessApiUsageException(
 					"The update method taking a KeyHolder should only be used when generated keys have " +
@@ -13,6 +19,105 @@
 
 
 
+@Override
+public String queryLabel(String entityName, String entityType, String labelName) {
+    Entity entity = queryEntity(entityName, entityType);
+    if (entity == null) {
+        return null;
+    }
+    return entity.getLabels().get(labelName);
+}
+
+@Override
+public List<Entity> queryEntitiesByLabel(String labelName, String labelValue) {
+    throw new UnsupportedOperationException("Not available now!");
+}
+
+/**
+ * Remove CMDB entity.
+ *
+ * @param entityName entity name
+ * @param entityType entity type
+ */
+public void removeEntity(String entityName, String entityType) {
+    if (!entityMap.containsKey(entityType)) {
+        return;
+    }
+    entityMap.get(entityType).remove(entityName);
+}
+
+/**
+ * Update entity.
+ *
+ * @param entity entity
+ */
+public void updateEntity(Entity entity) {
+    if (!entityTypeSet.contains(entity.getType())) {
+        return;
+    }
+    entityMap.get(entity.getType()).put(entity.getName(), entity);
+}
+
+public class CmdbLabelTask implements Runnable {
+
+    @Override
+    public void run() {
+
+        Loggers.MAIN.debug("LABEL-TASK {}", "start dump.");
+
+        if (cmdbService == null) {
+            return;
+        }
+
+        try {
+
+            Map<String, Label> tmpLabelMap = new HashMap<>(16);
+
+            Set<String> labelNames = cmdbService.getLabelNames();
+            if (labelNames == null || labelNames.isEmpty()) {
+                Loggers.MAIN.warn("CMDB-LABEL-TASK {}", "load label names failed!");
+            } else {
+                for (String labelName : labelNames) {
+                    // If get null label, it's still ok. We will try it later when we meet this label:
+                    tmpLabelMap.put(labelName, cmdbService.getLabel(labelName));
+                }
+
+                if (Loggers.MAIN.isDebugEnabled()) {
+                    Loggers.MAIN.debug("LABEL-TASK {}", "got label map:" + JacksonUtils.toJson(tmpLabelMap));
+                }
+
+                labelMap = tmpLabelMap;
+            }
+
+        } catch (Exception e) {
+            Loggers.MAIN.error("CMDB-LABEL-TASK {}", "dump failed!", e);
+        } finally {
+            CmdbExecutor.scheduleCmdbTask(this, switches.getLabelTaskInterval(), TimeUnit.SECONDS);
+        }
+    }
+}
+
+public class CmdbDumpTask implements Runnable {
+
+    @Override
+    public void run() {
+
+        try {
+
+            Loggers.MAIN.debug("DUMP-TASK {}", "start dump.");
+
+            if (cmdbService == null) {
+                return;
+            }
+            // refresh entity map:
+            entityMap = cmdbService.getAllEntities();
+        } catch (Exception e) {
+            Loggers.MAIN.error("DUMP-TASK {}", "dump failed!", e);
+        } finally {
+            CmdbExecutor.scheduleCmdbTask(this, switches.getDumpTaskInterval(), TimeUnit.SECONDS);
+        }
+    }
+}
 
     /** 字典主键 */
     @Excel(name = "字典主键", cellType = ColumnType.NUMERIC)
