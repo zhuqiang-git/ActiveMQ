@@ -149,6 +149,21 @@ public class SysConfigServiceImpl implements ISysConfigService
         }
     }
 
+
+
+    public static final String TENANT = "tenant";
+
+    public static final String DATA_ID = "dataId";
+
+    public static final String GROUP = "group";
+
+    public static final String CONTENT = "content";
+
+    public static final String CONFIG_TYPE = "configType";
+
+    public static final String ENCRYPTED_DATA_KEY = "encryptedDataKey";
+
+    public static final String TYPE = "type";
      /**
      * 记录登录信息
      * 

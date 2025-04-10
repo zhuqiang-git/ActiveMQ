@@ -13,6 +13,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 安全加密处理器
@@ -22,6 +23,23 @@ import java.util.HashMap;
  */
 public class SafetyEncryptProcessor implements EnvironmentPostProcessor {
 
+
+
+    public ClientAbilityControlManager() {
+    }
+
+    @Override
+    protected Map<AbilityMode, Map<AbilityKey, Boolean>> initCurrentNodeAbilities() {
+        Map<AbilityMode, Map<AbilityKey, Boolean>> abilities = new HashMap<>(1);
+        abilities.put(AbilityMode.SDK_CLIENT, SdkClientAbilities.getStaticAbilities());
+        return abilities;
+    }
+
+    @Override
+    public int getPriority() {
+        // if server ability manager exist, you should choose the server one
+        return 0;
+    }
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         /**
