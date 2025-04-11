@@ -1,6 +1,10 @@
 package com.ruoyi.system.mapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.ServiceLoader;
+
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysDept;
 
@@ -11,6 +15,74 @@ import com.ruoyi.common.core.domain.entity.SysDept;
  */
 public interface SysDeptMapper
 {
+
+
+    private final List<IConfigFilter> filters = new ArrayList<>();
+
+    private final Properties initProperty;
+
+    public ConfigFilterChainManager(Properties properties) {
+        this.initProperty = properties;
+        ServiceLoader<IConfigFilter> configFilters = ServiceLoader.load(IConfigFilter.class);
+        for (IConfigFilter configFilter : configFilters) {
+            addFilter(configFilter);
+        }
+    }
+
+    /**
+     * Add filter.
+     *
+     * @param filter filter
+     * @return this
+     */
+    public synchronized ConfigFilterChainManager addFilter(IConfigFilter filter) {
+        // init
+        filter.init(this.initProperty);
+        // ordered by order value
+        int i = 0;
+        while (i < this.filters.size()) {
+            IConfigFilter currentValue = this.filters.get(i);
+            if (currentValue.getFilterName().equals(filter.getFilterName())) {
+                break;
+            }
+            if (filter.getOrder() >= currentValue.getOrder() && i < this.filters.size()) {
+                i++;
+            } else {
+                this.filters.add(i, filter);
+                break;
+            }
+        }
+
+        if (i == this.filters.size()) {
+            this.filters.add(i, filter);
+        }
+        return this;
+    }
+
+    @Override
+    public void doFilter(IConfigRequest request, IConfigResponse response) throws NacosException {
+        new VirtualFilterChain(this.filters).doFilter(request, response);
+    }
+
+    private static class VirtualFilterChain implements IConfigFilterChain {
+
+        private final List<? extends IConfigFilter> additionalFilters;
+
+        private int currentPosition = 0;
+
+        public VirtualFilterChain(List<? extends IConfigFilter> additionalFilters) {
+            this.additionalFilters = additionalFilters;
+        }
+
+        @Override
+        public void doFilter(final IConfigRequest request, final IConfigResponse response) throws NacosException {
+            if (this.currentPosition != this.additionalFilters.size()) {
+                this.currentPosition++;
+                IConfigFilter nextFilter = this.additionalFilters.get(this.currentPosition - 1);
+                nextFilter.doFilter(request, response, this);
+            }
+        }
+    }
     /**
      * 查询部门管理数据
      * 
