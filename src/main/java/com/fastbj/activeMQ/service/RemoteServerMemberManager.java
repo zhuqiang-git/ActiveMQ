@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -27,7 +29,21 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Service
 @EnabledRemoteHandler
 public class RemoteServerMemberManager implements NacosMemberManager {
-    
+
+
+    private final Map<String, Object> param = new HashMap<>();
+
+    @Override
+    public Object getParameter(String key) {
+        return param.get(key);
+    }
+
+    @Override
+    public void setParameter(String key, Object value) {
+        param.put(key, value);
+    }
+
+
     /**
      * Nacos remote servers cluster node list.
      */
