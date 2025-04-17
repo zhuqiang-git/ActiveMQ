@@ -5,6 +5,7 @@ import java.util.Map;
 import com.jd.platform.async.executor.Async;
 import com.jd.platform.async.worker.WorkResult;
 import com.jd.platform.async.wrapper.WorkerWrapper;
+import org.slf4j.Logger;
 
 /**
  * @author sjsdfg
@@ -113,6 +114,39 @@ public class LambdaTest {
             return true;
         }
     }
+
+    /**
+     * whether is multi instance.
+     *
+     * @return whether multi
+     */
+    public static Boolean isMultiInstance() {
+        return isMultiInstance;
+    }
+
+    private static Boolean isMultiInstance = false;
+
+    private static final String TRUE = "true";
+
+    private static final Logger LOGGER = LogUtils.logger(JvmUtil.class);
+
+    private static final String IS_MULTI_INSTANCE_PROPERTY = "isMultiInstance";
+
+    private static final String DEFAULT_IS_MULTI_INSTANCE = "false";
+
+    static {
+        init();
+    }
+
+    private static void init() {
+        String multiDeploy = NacosClientProperties.PROTOTYPE
+                .getProperty(IS_MULTI_INSTANCE_PROPERTY, DEFAULT_IS_MULTI_INSTANCE);
+        if (TRUE.equals(multiDeploy)) {
+            isMultiInstance = true;
+        }
+        LOGGER.info("isMultiInstance:{}", isMultiInstance);
+    }
+
 
     /**
      * 验证是否重复提交由子类实现具体的防重复提交的规则
